@@ -1,0 +1,226 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "Total Security Software CPU (% of one core)",
+      "description": "Combined CPU usage of all Defender + ZScaler processes as a percentage of one CPU core",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "stacking": { "mode": "normal" }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=\"defender_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=\"defender_total\"}[5m])\n) * 100",
+          "legendFormat": "Defender",
+          "refId": "A"
+        },
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=\"zscaler_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=\"zscaler_total\"}[5m])\n) * 100",
+          "legendFormat": "ZScaler",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "Defender - CPU by Component (% of one core)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "spanNulls": true,
+            "stacking": { "mode": "normal" }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=~\"defender_.*\", group!=\"defender_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=~\"defender_.*\", group!=\"defender_total\"}[5m])\n) * 100",
+          "legendFormat": "{{group}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }
+      }
+    },
+    {
+      "title": "ZScaler - CPU by Component (% of one core)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "spanNulls": true,
+            "stacking": { "mode": "normal" }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=~\"zscaler_.*\", group!=\"zscaler_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=~\"zscaler_.*\", group!=\"zscaler_total\"}[5m])\n) * 100",
+          "legendFormat": "{{group}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }
+      }
+    },
+    {
+      "title": "Memory RSS (MB)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "macos_process_memory_rss_bytes{group=\"defender_total\"} / 1024 / 1024",
+          "legendFormat": "Defender",
+          "refId": "A"
+        },
+        {
+          "expr": "macos_process_memory_rss_bytes{group=\"zscaler_total\"} / 1024 / 1024",
+          "legendFormat": "ZScaler",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "Memory RSS by Component (MB)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "spanNulls": true,
+            "stacking": { "mode": "normal" }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "macos_process_memory_rss_bytes{group=~\"defender_.*|zscaler_.*\", group!~\".*_total\"} / 1024 / 1024",
+          "legendFormat": "{{group}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }
+      }
+    },
+    {
+      "title": "Process & Thread Count",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "macos_process_num_procs{group=\"defender_total\"}",
+          "legendFormat": "Defender Procs",
+          "refId": "A"
+        },
+        {
+          "expr": "macos_process_num_procs{group=\"zscaler_total\"}",
+          "legendFormat": "ZScaler Procs",
+          "refId": "B"
+        },
+        {
+          "expr": "macos_process_num_threads{group=\"defender_total\"}",
+          "legendFormat": "Defender Threads",
+          "refId": "C"
+        },
+        {
+          "expr": "macos_process_num_threads{group=\"zscaler_total\"}",
+          "legendFormat": "ZScaler Threads",
+          "refId": "D"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull"] }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["security", "monitoring", "macos"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Security Software Impact",
+  "uid": "security-software-impact",
+  "version": 1,
+  "refresh": "30s"
+}

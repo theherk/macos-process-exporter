@@ -1,0 +1,13 @@
+# Prometheus configuration for macOS process monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "macos-process-exporter"
+    scrape_interval: 15s
+    static_configs:
+      - targets: ["127.0.0.1:9256"]
+        labels:
+          host: "macbook"

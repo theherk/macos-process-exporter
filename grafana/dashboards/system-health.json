@@ -1,0 +1,413 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "System Load Average",
+      "description": "1m, 5m, and 15m load averages. Values above CPU count indicate saturation.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 8 },
+              { "color": "red", "value": 16 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "CPU Count" },
+            "properties": [
+              { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+              { "id": "custom.lineWidth", "value": 1 },
+              { "id": "custom.fillOpacity", "value": 0 },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "macos_system_load_average{interval=\"1m\"}",
+          "legendFormat": "Load 1m",
+          "refId": "A"
+        },
+        {
+          "expr": "macos_system_load_average{interval=\"5m\"}",
+          "legendFormat": "Load 5m",
+          "refId": "B"
+        },
+        {
+          "expr": "macos_system_load_average{interval=\"15m\"}",
+          "legendFormat": "Load 15m",
+          "refId": "C"
+        },
+        {
+          "expr": "macos_system_cpu_count",
+          "legendFormat": "CPU Count",
+          "refId": "D"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "Load / CPU Saturation Ratio",
+      "description": "Load average divided by CPU count. Above 1.0 = system is saturated.",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.7 },
+              { "color": "red", "value": 1.0 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "macos_system_load_average{interval=\"1m\"} / ignoring(interval) macos_system_cpu_count",
+          "legendFormat": "Saturation (1m)",
+          "refId": "A"
+        },
+        {
+          "expr": "macos_system_load_average{interval=\"5m\"} / ignoring(interval) macos_system_cpu_count",
+          "legendFormat": "Saturation (5m)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+      }
+    },
+    {
+      "title": "System Memory",
+      "description": "Total vs available vs used memory",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decgbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Total" },
+            "properties": [
+              { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+              { "id": "custom.fillOpacity", "value": 0 }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "macos_system_memory_used_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "Used",
+          "refId": "A"
+        },
+        {
+          "expr": "macos_system_memory_available_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "Available",
+          "refId": "B"
+        },
+        {
+          "expr": "macos_system_memory_total_bytes / 1024 / 1024 / 1024",
+          "legendFormat": "Total",
+          "refId": "C"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "Swap Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "macos_system_swap_used_bytes / 1024 / 1024",
+          "legendFormat": "Swap Used (MB)",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "System Disk I/O Throughput",
+      "description": "System-wide disk read/write rate. Correlate with security software CPU spikes to identify scanning activity.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "rate(macos_system_disk_read_bytes_total[5m])",
+          "legendFormat": "Read",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(macos_system_disk_write_bytes_total[5m])",
+          "legendFormat": "Write",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "System Disk IOPS",
+      "description": "System-wide disk operations per second (all processes combined).",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "iops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "rate(macos_system_disk_read_count_total[5m])",
+          "legendFormat": "Read Ops",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(macos_system_disk_write_count_total[5m])",
+          "legendFormat": "Write Ops",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "Spotlight CPU (% of one core)",
+      "description": "CPU usage of Spotlight indexing processes (mds, mdworker, mds_stores)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "stacking": { "mode": "normal" }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=~\"spotlight_.*\", group!=\"spotlight_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=~\"spotlight_.*\", group!=\"spotlight_total\"}[5m])\n) * 100",
+          "legendFormat": "{{group}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }
+      }
+    },
+    {
+      "title": "Spotlight vs Security Software CPU",
+      "description": "Compare Spotlight indexing overhead against Defender + ZScaler",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=\"spotlight_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=\"spotlight_total\"}[5m])\n) * 100",
+          "legendFormat": "Spotlight",
+          "refId": "A"
+        },
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=\"defender_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=\"defender_total\"}[5m])\n) * 100",
+          "legendFormat": "Defender",
+          "refId": "B"
+        },
+        {
+          "expr": "(\n  rate(macos_process_cpu_user_seconds_total{group=\"zscaler_total\"}[5m])\n  + rate(macos_process_cpu_system_seconds_total{group=\"zscaler_total\"}[5m])\n) * 100",
+          "legendFormat": "ZScaler",
+          "refId": "C"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] }
+      }
+    },
+    {
+      "title": "Spotlight Memory RSS (MB)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 38 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "stacking": { "mode": "normal" }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "macos_process_memory_rss_bytes{group=~\"spotlight_.*\", group!=\"spotlight_total\"} / 1024 / 1024",
+          "legendFormat": "{{group}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }
+      }
+    },
+    {
+      "title": "Spotlight Process Count",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 38 },
+      "datasource": { "type": "prometheus", "uid": "macos-process-exporter-prom" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "macos_process_num_procs{group=\"spotlight_total\"}",
+          "legendFormat": "Spotlight Processes",
+          "refId": "A"
+        },
+        {
+          "expr": "macos_process_num_threads{group=\"spotlight_total\"}",
+          "legendFormat": "Spotlight Threads",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "textMode": "auto",
+        "colorMode": "value"
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["system", "monitoring", "macos", "spotlight"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "System Health & Spotlight",
+  "uid": "system-health-spotlight",
+  "version": 2,
+  "refresh": "30s"
+}

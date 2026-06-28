@@ -1,0 +1,69 @@
+# macOS Process Exporter - Example Configuration
+#
+# Each entry maps a friendly metric label to a regex matched against the full
+# command line of each process. Multiple processes matching the same pattern
+# are aggregated into one group (summed CPU/memory).
+#
+# A process can match multiple groups. This is intentional for aggregate groups
+# like "defender_total" which re-match the same processes as the individual
+# "defender_*" groups. Use the _total groups for "overall impact" panels and
+# individual groups for "which component is worst" breakdowns.
+#
+# Customize this for the processes you want to track.
+
+listen_port: 9256
+
+process_groups:
+  # Microsoft Defender
+  - name: defender_privileged
+    cmdline_regex: "wdavdaemon privileged"
+  - name: defender_enterprise
+    cmdline_regex: "wdavdaemon_enterprise(?!.*telemetryd)"
+  - name: defender_unprivileged
+    cmdline_regex: "wdavdaemon_unprivileged"
+  - name: defender_epsext
+    cmdline_regex: "epsext"
+  - name: defender_netext
+    cmdline_regex: "netext"
+  - name: defender_dlp
+    cmdline_regex: "dlp_agent"
+  - name: defender_tracer
+    cmdline_regex: "tracer.*--daemon"
+  - name: defender_telemetry
+    cmdline_regex: "telemetryd_v2"
+  - name: defender_helper
+    cmdline_regex: "Microsoft Defender Helper"
+
+  # ZScaler
+  - name: zscaler_tunnel
+    cmdline_regex: "ZscalerTunnel"
+  - name: zscaler_service
+    cmdline_regex: "ZscalerService"
+  - name: zscaler_dpd
+    cmdline_regex: "zdpd\\.app"
+  - name: zscaler_agent
+    cmdline_regex: "zdpagent"
+  - name: zscaler_classifier
+    cmdline_regex: "zdpclassifier"
+  - name: zscaler_communicator
+    cmdline_regex: "zdpcommunicator"
+  - name: zscaler_esd
+    cmdline_regex: "zdpesd"
+  - name: zscaler_app
+    cmdline_regex: "Zscaler\\.app/Contents/MacOS/Zscaler$"
+
+  # Spotlight / metadata indexing
+  - name: spotlight_mds
+    cmdline_regex: "/mds$"
+  - name: spotlight_mdworker
+    cmdline_regex: "mdworker"
+  - name: spotlight_mds_stores
+    cmdline_regex: "mds_stores"
+
+  # Aggregate groups (sum of all processes matching any sub-pattern)
+  - name: defender_total
+    cmdline_regex: "wdavdaemon|epsext|netext|dlp_agent|tracer.*--daemon|telemetryd_v2|Microsoft Defender Helper"
+  - name: zscaler_total
+    cmdline_regex: "ZscalerTunnel|ZscalerService|zdpd|zdpagent|zdpclassifier|zdpcommunicator|zdpesd|Zscaler\\.app/Contents/MacOS/Zscaler$"
+  - name: spotlight_total
+    cmdline_regex: "/mds$|mdworker|mds_stores"
