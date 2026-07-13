@@ -3,3 +3,4 @@
 --storage.tsdb.retention.time=730d
 --web.listen-address=127.0.0.1:9090
 --web.enable-lifecycle
+--web.enable-admin-api
